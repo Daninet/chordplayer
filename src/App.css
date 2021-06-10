@@ -14,3 +14,7 @@ button {
 .chords {
   display: flex;
 }
+
+.tuner {
+  width: 400px;
+}

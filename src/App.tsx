@@ -1,13 +1,18 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import './App.css';
+import { AudioFontPlayer } from './AudioFontPlayer';
 import { CHORDTYPES, getChordPitches, getChordPositions, NOTES, positionsToPitches } from './chords';
 import { ChordView } from './ChordView';
-import Player from './Player';
 
 export const App: React.FC = () => {
-  let player = useRef(null);
+  const player = useRef(null);
+  useEffect(() => {
+    player.current = new AudioFontPlayer();
+  }, []);
+
   const [lastChordNote, setLastChordNote] = useState(0);
   const [lastChordType, setLastChordType] = useState(0);
+  const [tuning, setTuning] = useState(440);
   const [, render] = useState(0);
 
   const getStorageKey = (note: string, type: string) => `viola-${note}${type}`;
@@ -83,10 +88,19 @@ export const App: React.FC = () => {
     );
   };
 
+  const updateTuning = (freq: number) => {
+    setTuning(freq);
+    player.current.setFreq(freq);
+  };
+
   return (
     <div className="App" onKeyDown={onKeyDown} tabIndex={0}>
+      <input className="tuner" type="range" step="0.1" min="400" max="500" value={tuning} onChange={(e) => updateTuning(Number(e.target.value))} />
+      <br />
+      {tuning.toFixed(1)}
+      <br />
       {CHORDTYPES.map(type => <>{renderButtons(type)}<br/></>)}
-      <Player ref={player}/>
+      {/* <Player ref={player}/> */}
       <div className="chords">
         {positions.map(pos => renderChord(pos))}
       </div>

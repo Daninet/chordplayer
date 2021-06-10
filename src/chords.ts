@@ -62,7 +62,6 @@ const getChords = (pitches: number[]) => {
 const getDifficulty = (pitches: number[]) => {
   const positions = pitches.map((pitch, i) => pitch - TUNING[i]);
   const score = positions.reduce((prev, curr) => curr === 0 ? prev + 2 : prev + curr, 0);
-  console.log('score', score);
   return score;
 };
 
