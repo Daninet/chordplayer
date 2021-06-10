@@ -1,0 +1,12 @@
+.chordview {
+  margin: 30px;
+  table-layout: fixed;
+  border-collapse: collapse;
+
+  td {
+    width: 20px;
+    height: 20px;
+    overflow: hidden;
+    border: 2px solid gray;
+  }
+}
