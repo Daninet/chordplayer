@@ -96,7 +96,7 @@ export const App: React.FC = () => {
 
   useEffect(() => {
     const listener = (e) => {
-      console.log(e.key, e.code);
+      if (e.ctrlKey || e.shiftKey || e.altKey) return;
       const res = onKeyDown(e.key, e.code);
       if (res) {
         e.preventDefault();
