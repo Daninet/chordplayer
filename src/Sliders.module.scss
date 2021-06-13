@@ -1,0 +1,11 @@
+.sliders {
+  margin: 0 30px;
+  display: flex;
+
+  > label {
+    width: 50%;
+    .tuner {
+      width: 90%;
+    }
+  }
+}

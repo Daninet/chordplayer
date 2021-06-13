@@ -6,7 +6,7 @@ export class AudioFontPlayer {
   private player;
   private audioContext;
   private envelopes = [];
-  private volume = 1;
+  private volume = 0.5;
   private playbackRate = 1.0;
 
   constructor () {
@@ -45,8 +45,22 @@ export class AudioFontPlayer {
     }
   }
 
+  get playing() {
+    return this.envelopes.length > 0;
+  }
+
   setFreq(freq: number) {
     this.playbackRate = freq / 440;
+    const pitches = this.envelopes.map(e => e.pitch);
+    this.playChord(pitches);
+  }
+
+  setVolume(volume: number) {
+    this.volume = volume;
+    // it doesn't accept 0
+    if (this.volume === 0) {
+      this.volume = 0.0001;
+    }
     const pitches = this.envelopes.map(e => e.pitch);
     this.playChord(pitches);
   }

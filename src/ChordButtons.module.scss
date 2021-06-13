@@ -1,0 +1,24 @@
+.chordbuttons {
+  margin-bottom: 10px;
+
+  > table {
+    margin: 10px auto;
+    position: relative;
+    left: -10px;
+  }
+  
+  button {
+    width: 70px;
+    height: 30px;
+    border: 1px solid gray;
+
+    &.active {
+      background: goldenrod;
+    }
+
+    &.stop {
+      width: 100%;
+      background: #ff9797;
+    }
+  }
+}

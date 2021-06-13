@@ -1,6 +1,8 @@
 import { isEqual } from 'lodash';
 
 export const NOTES = ['C', 'C♯', 'D', 'E♭', 'E', 'F', 'F♯', 'G', 'A♭', 'A', 'B', 'H'];
+export const NOTES_CHROMATIC_ORDER = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
+export const NOTES_FIFTHS_ORDER = [6, 1, 8, 3, 10, 5, 0, 7, 2, 9, 4, 11];
 export const CHORDTYPES = ['', 'm', '7', 'dim', '5', '6', 'm7', 'maj7', 'sus2', 'sus4', 'm6', 'aug'];
 
 const TUNING = [55, 62, 57];

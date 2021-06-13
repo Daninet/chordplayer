@@ -43,7 +43,12 @@ export const ChordView: React.FC<ChordViewProps> = (props) => {
         </tbody>
       </table>
       <div className={styles.names}>
-        {getAlternativeNames(positions).map(name => <>{name}<br /></>)}
+        {getAlternativeNames(positions).map(name =>
+          <React.Fragment key={name}>
+            {name}
+            <br />
+          </React.Fragment>
+        )}
       </div>
     </div>
   )
