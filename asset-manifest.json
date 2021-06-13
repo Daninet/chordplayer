@@ -1,20 +1,20 @@
 {
   "files": {
-    "main.css": "/static/css/main.4fa002b6.chunk.css",
-    "main.js": "/static/js/main.42a529b1.chunk.js",
-    "main.js.map": "/static/js/main.42a529b1.chunk.js.map",
-    "runtime-main.js": "/static/js/runtime-main.1ab152b1.js",
-    "runtime-main.js.map": "/static/js/runtime-main.1ab152b1.js.map",
-    "static/js/2.2d825ef1.chunk.js": "/static/js/2.2d825ef1.chunk.js",
-    "static/js/2.2d825ef1.chunk.js.map": "/static/js/2.2d825ef1.chunk.js.map",
-    "static/js/3.3cc28fcf.chunk.js": "/static/js/3.3cc28fcf.chunk.js",
-    "static/js/3.3cc28fcf.chunk.js.map": "/static/js/3.3cc28fcf.chunk.js.map",
-    "index.html": "/index.html",
-    "static/css/main.4fa002b6.chunk.css.map": "/static/css/main.4fa002b6.chunk.css.map",
-    "static/js/2.2d825ef1.chunk.js.LICENSE.txt": "/static/js/2.2d825ef1.chunk.js.LICENSE.txt"
+    "main.css": "/chordplayer/static/css/main.4fa002b6.chunk.css",
+    "main.js": "/chordplayer/static/js/main.42a529b1.chunk.js",
+    "main.js.map": "/chordplayer/static/js/main.42a529b1.chunk.js.map",
+    "runtime-main.js": "/chordplayer/static/js/runtime-main.c8c145a3.js",
+    "runtime-main.js.map": "/chordplayer/static/js/runtime-main.c8c145a3.js.map",
+    "static/js/2.2d825ef1.chunk.js": "/chordplayer/static/js/2.2d825ef1.chunk.js",
+    "static/js/2.2d825ef1.chunk.js.map": "/chordplayer/static/js/2.2d825ef1.chunk.js.map",
+    "static/js/3.3cc28fcf.chunk.js": "/chordplayer/static/js/3.3cc28fcf.chunk.js",
+    "static/js/3.3cc28fcf.chunk.js.map": "/chordplayer/static/js/3.3cc28fcf.chunk.js.map",
+    "index.html": "/chordplayer/index.html",
+    "static/css/main.4fa002b6.chunk.css.map": "/chordplayer/static/css/main.4fa002b6.chunk.css.map",
+    "static/js/2.2d825ef1.chunk.js.LICENSE.txt": "/chordplayer/static/js/2.2d825ef1.chunk.js.LICENSE.txt"
   },
   "entrypoints": [
-    "static/js/runtime-main.1ab152b1.js",
+    "static/js/runtime-main.c8c145a3.js",
     "static/js/2.2d825ef1.chunk.js",
     "static/css/main.4fa002b6.chunk.css",
     "static/js/main.42a529b1.chunk.js"
