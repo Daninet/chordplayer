@@ -1,8 +1,8 @@
 {
   "files": {
     "main.css": "/chordplayer/static/css/main.132e6208.chunk.css",
-    "main.js": "/chordplayer/static/js/main.07311754.chunk.js",
-    "main.js.map": "/chordplayer/static/js/main.07311754.chunk.js.map",
+    "main.js": "/chordplayer/static/js/main.ae4acd31.chunk.js",
+    "main.js.map": "/chordplayer/static/js/main.ae4acd31.chunk.js.map",
     "runtime-main.js": "/chordplayer/static/js/runtime-main.06455c89.js",
     "runtime-main.js.map": "/chordplayer/static/js/runtime-main.06455c89.js.map",
     "static/js/2.42ead1d1.chunk.js": "/chordplayer/static/js/2.42ead1d1.chunk.js",
@@ -17,6 +17,6 @@
     "static/js/runtime-main.06455c89.js",
     "static/js/2.42ead1d1.chunk.js",
     "static/css/main.132e6208.chunk.css",
-    "static/js/main.07311754.chunk.js"
+    "static/js/main.ae4acd31.chunk.js"
   ]
 }
