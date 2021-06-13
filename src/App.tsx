@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import './App.css';
+import styles from './App.module.scss';
 import { AudioFontPlayer } from './AudioFontPlayer';
 import { CHORDTYPES, getChordPitches, getChordPositions, NOTES, positionsToPitches } from './chords';
 import { ChordView } from './ChordView';
@@ -94,14 +94,14 @@ export const App: React.FC = () => {
   };
 
   return (
-    <div className="App" onKeyDown={onKeyDown} tabIndex={0}>
-      <input className="tuner" type="range" step="0.1" min="400" max="500" value={tuning} onChange={(e) => updateTuning(Number(e.target.value))} />
+    <div className={styles.app} onKeyDown={onKeyDown} tabIndex={0}>
+      <input className={styles.tuner} type="range" step="0.1" min="400" max="500" value={tuning} onChange={(e) => updateTuning(Number(e.target.value))} />
       <br />
       {tuning.toFixed(1)}
       <br />
       {CHORDTYPES.map(type => <>{renderButtons(type)}<br/></>)}
       {/* <Player ref={player}/> */}
-      <div className="chords">
+      <div className={styles.chords}>
         {positions.map(pos => renderChord(pos))}
       </div>
     </div>
