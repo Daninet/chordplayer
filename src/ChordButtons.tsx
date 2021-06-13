@@ -5,27 +5,31 @@ import styles from './ChordButtons.module.scss';
 interface ChordButtonsProps {
   activeNote: number;
   activeType: number;
+  pendingType: number;
   onClick: (note: number, type: number) => void;
   onStop: () => void;
 }
 
 export const CHROMATIC_KEYMAP = ['z', 's', 'x', 'd', 'c', 'v', 'g', 'b', 'h', 'n', 'j', 'm'];
+export const CHROMATIC_KEYMAP_CODES = ['KeyZ', 'KeyS', 'KeyX', 'KeyD', 'KeyC', 'KeyV', 'KeyG', 'KeyB', 'KeyH', 'KeyN', 'KeyJ', 'KeyM'];
 export const FIFTHS_KEYMAP = ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[', ']'];
+export const FIFTHS_KEYMAP_CODES = ['KeyQ', 'KeyW', 'KeyE', 'KeyR', 'KeyT', 'KeyY', 'KeyU', 'KeyI', 'KeyO', 'KeyP', 'BracketLeft', 'BracketRight'];
 
 export const ChordButtons: React.FC<ChordButtonsProps> = (props) => {
-  const { activeNote, activeType, onClick, onStop } = props;
+  const { activeNote, activeType, pendingType, onClick, onStop } = props;
   const [layout, setLayout] = useState('chromatic');
 
   const renderButtons = (typeIndex: number) => {
     const order = layout === 'chromatic' ? NOTES_CHROMATIC_ORDER : NOTES_FIFTHS_ORDER;
+    const isButtonActive = (noteIndex: number) => activeType === typeIndex && activeNote === noteIndex;
 
     return (
-      <tr key={typeIndex}>
+      <tr className={pendingType === typeIndex ? styles.pending : ''} key={typeIndex}>
         <td>{typeIndex < 9 ? typeIndex + 1 : ''}</td>
         {order.map((noteIndex) => (
           <td key={noteIndex + typeIndex}>
             <button
-              className={activeType === typeIndex && activeNote === noteIndex ? styles.active : ' '}
+              className={isButtonActive(noteIndex) ? styles.active : ''}
               onClick={() => onClick(noteIndex, typeIndex)}
             >
               {NOTES[noteIndex]}{CHORDTYPES[typeIndex]}

@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import styles from './App.module.scss';
 import { AudioFontPlayer } from './AudioFontPlayer';
-import { ChordButtons } from './ChordButtons';
-import { CHORDTYPES, getChordPitches, getChordPositions, NOTES, positionsToPitches } from './chords';
+import { ChordButtons, CHROMATIC_KEYMAP_CODES, FIFTHS_KEYMAP_CODES } from './ChordButtons';
+import { CHORDTYPES, getChordPitches, getChordPositions, NOTES, NOTES_FIFTHS_ORDER, positionsToPitches } from './chords';
 import { ChordView } from './ChordView';
 import { Sliders } from './Sliders';
 
@@ -17,6 +17,7 @@ export const App: React.FC = () => {
 
   const [lastChordNote, setLastChordNote] = useState(0);
   const [lastChordType, setLastChordType] = useState(0);
+  const [pendingChordType, setPendingChordType] = useState<number>(null);
   const [, render] = useState(0);
 
   const getStorageKey = (note: string, type: string) => `viola-${note}${type}`;
@@ -46,6 +47,7 @@ export const App: React.FC = () => {
 
     setLastChordNote(note);
     setLastChordType(type);
+    setPendingChordType(null);
 
     player.current.playChord(pitches);
   }, [getPitches])
@@ -63,22 +65,47 @@ export const App: React.FC = () => {
     player.current.stop();
   };
 
-  const onKeyDown: React.KeyboardEventHandler<HTMLDivElement> = (e) => {
-    const noteKeymap = ['z', 's', 'x', 'd', 'c', 'v', 'g', 'b', 'h', 'n', 'j', 'm', ','];
-    console.log(e.key);
-    if (noteKeymap.includes(e.key)) {
-      return playChord(noteKeymap.indexOf(e.key) % 12, lastChordType);
+  const onKeyDown = useCallback((key: string, keyCode: string) => {
+    console.log(key, keyCode);
+    if (CHROMATIC_KEYMAP_CODES.includes(keyCode)) {
+      console.log('pending', pendingChordType);
+      playChord(CHROMATIC_KEYMAP_CODES.indexOf(keyCode) % 12, pendingChordType ?? lastChordType);
+      setPendingChordType(null);
+      return true;
+    }
+
+    if (FIFTHS_KEYMAP_CODES.includes(keyCode)) {
+      playChord(NOTES_FIFTHS_ORDER[FIFTHS_KEYMAP_CODES.indexOf(keyCode) % 12], pendingChordType ?? lastChordType);
+      setPendingChordType(null);
+      return true;
     }
 
     const typeKeymap = ['1', '2', '3', '4', '5', '6', '7', '8', '9'];
-    if (typeKeymap.includes(e.key)) {
-      return setLastChordType(typeKeymap.indexOf(e.key));
+    if (typeKeymap.includes(key)) {
+      setPendingChordType(typeKeymap.indexOf(key));
+      return true;
     }
 
-    if (e.key === ' ') {
-      return onStop();
+    if (key === ' ') {
+      onStop();
+      return true;
     }
-  };
+
+    return false;
+  }, [pendingChordType, lastChordType, playChord]);
+
+  useEffect(() => {
+    const listener = (e) => {
+      console.log(e.key, e.code);
+      const res = onKeyDown(e.key, e.code);
+      if (res) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    }
+    document.addEventListener("keydown", listener);
+    return () => document.removeEventListener("keydown", listener);
+  }, [onKeyDown]);
 
   const renderChord = (pos: [number, number, number]) => {
     const key = JSON.stringify(pos);
@@ -107,10 +134,19 @@ export const App: React.FC = () => {
   }
 
   return (
-    <div className={styles.app} onKeyDown={onKeyDown} tabIndex={0}>
-      
-      <ChordButtons activeNote={lastChordNote} activeType={lastChordType} onClick={playChord} onStop={onStop} />
-      <Sliders onSetTuning={onSetTuning} onSetVolume={onSetVolume} />
+    <div className={styles.app}>
+      <ChordButtons
+        activeNote={lastChordNote}
+        activeType={lastChordType}
+        pendingType={pendingChordType}
+        onClick={playChord}
+        onStop={onStop}
+      />
+
+      <Sliders
+        onSetTuning={onSetTuning}
+        onSetVolume={onSetVolume}
+      />
       
       <div className={styles.chords}>
         {positions.map(pos => renderChord(pos))}

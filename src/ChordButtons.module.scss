@@ -5,6 +5,16 @@
     margin: 10px auto;
     position: relative;
     left: -10px;
+    border-collapse: collapse;
+
+    td {
+      border: 0;
+      padding: 2px;
+    }
+
+    tr.pending {
+      background: #ffe092;
+    }
   }
   
   button {
