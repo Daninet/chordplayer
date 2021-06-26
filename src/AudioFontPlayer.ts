@@ -8,6 +8,7 @@ export class AudioFontPlayer {
   private envelopes = [];
   private volume = 0.5;
   private playbackRate = 1.0;
+  private duration = 0.3;
 
   constructor () {
     const AudioContextFunc = window.AudioContext || (window as any).webkitAudioContext;
@@ -33,13 +34,7 @@ export class AudioFontPlayer {
 
   playChord(pitches: number[]) {
     this.stop();
-    pitches.forEach(pitch => this.queueNote(pitch, 0.3));
-  }
-
-  strumChord(pitches: number[]){
-    this.stop();
-    this.player.queueStrumDown(this.audioContext, this.audioContext.destination, soundFont, 0, pitches, 0.5, this.volume);
-    // pitches.forEach(pitch => this.queueNote(pitch, 0.1));
+    pitches.forEach(pitch => this.queueNote(pitch, this.duration));
   }
 
   stop() {
@@ -68,5 +63,9 @@ export class AudioFontPlayer {
     }
     const pitches = this.envelopes.map(e => e.pitch);
     this.playChord(pitches);
+  }
+
+  setDuration(duration: number) {
+    this.duration = duration;
   }
 }

@@ -5,6 +5,7 @@ import { ChordButtons, CHROMATIC_KEYMAP_CODES, FIFTHS_KEYMAP_CODES_SEVENTH, FIFT
 import { CHORDTYPES, getChordPitches, getChordPositions, NOTES, NOTES_FIFTHS_ORDER, positionsToPitches } from './chords';
 import { ChordView } from './ChordView';
 import { Sliders } from './Sliders';
+import { Sustain } from './Sustain';
 
 export const App: React.FC = () => {
   const player = useRef(null);
@@ -17,6 +18,7 @@ export const App: React.FC = () => {
 
   const [lastChordNote, setLastChordNote] = useState(0);
   const [lastChordType, setLastChordType] = useState(0);
+  const [keyUpEvent, setKeyUpEvent] = useState(true);
   const [pendingChordType, setPendingChordType] = useState<number>(null);
   const [layout, setLayout] = useState<'chromatic' | 'fifths'>('chromatic');
   const [, render] = useState(0);
@@ -119,6 +121,7 @@ export const App: React.FC = () => {
   useEffect(() => {
     const listener = (e) => {
       if (e.ctrlKey || e.shiftKey || e.altKey) return;
+      if (e.repeat) return;
       const res = layout === 'chromatic' ? onKeyDownChromatic(e.key, e.code) : onKeyDownFifths(e.key, e.code);
       if (res) {
         e.preventDefault();
@@ -128,6 +131,24 @@ export const App: React.FC = () => {
     document.addEventListener("keydown", listener);
     return () => document.removeEventListener("keydown", listener);
   }, [layout, onKeyDownChromatic, onKeyDownFifths]);
+
+  useEffect(() => {
+    if (!keyUpEvent) return;
+    const listener = (e) => {
+      if (e.ctrlKey || e.shiftKey || e.altKey) return;
+      if (CHROMATIC_KEYMAP_CODES.includes(e.code)
+        || FIFTHS_KEYMAP_CODES_MAJOR.includes(e.code)
+        || FIFTHS_KEYMAP_CODES_MINOR.includes(e.code)
+        || FIFTHS_KEYMAP_CODES_SEVENTH.includes(e.code)){
+        onStop();
+        e.preventDefault();
+        e.stopPropagation();
+        return true;
+      }
+    }
+    document.addEventListener("keyup", listener);
+    return () => document.removeEventListener("keyup", listener);
+  }, [keyUpEvent]);
 
   const renderChord = (pos: [number, number, number]) => {
     const key = JSON.stringify(pos);
@@ -145,6 +166,16 @@ export const App: React.FC = () => {
 
   const onSetTuning = useCallback((freq: number) => {
     player.current.setFreq(freq);
+  }, []);
+
+  const onSetSustain = useCallback((duration: number) => {
+    if (duration === null) {
+      player.current.setDuration(999);
+      setKeyUpEvent(true);
+    } else {
+      player.current.setDuration(duration);
+      setKeyUpEvent(false);
+    }
   }, []);
 
   const onSetVolume = useCallback((volume: number) => {
@@ -165,6 +196,10 @@ export const App: React.FC = () => {
         onStop={onStop}
         layout={layout}
         setLayout={setLayout}
+      />
+
+      <Sustain
+        onSetSustain={onSetSustain}
       />
 
       <Sliders

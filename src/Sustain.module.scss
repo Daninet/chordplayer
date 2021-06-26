@@ -1,0 +1,12 @@
+.sustain {
+  margin: 0 30px;
+  display: flex;
+
+  .left, .right {
+    width: 50%;
+
+    .tuner {
+      width: 90%;
+    }
+  }
+}
