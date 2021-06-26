@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { CHORDTYPES, NOTES, NOTES_CHROMATIC_ORDER, NOTES_FIFTHS_ORDER } from './chords';
 import styles from './ChordButtons.module.scss';
 
