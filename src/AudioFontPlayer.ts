@@ -26,7 +26,6 @@ export class AudioFontPlayer {
     const baseDetune = zone.originalPitch - 100.0 * zone.coarseTune - zone.fineTune;
 		const playbackRate = this.playbackRate * Math.pow(2, (100.0 * note - baseDetune) / 1200.0);
     const envelope = this.player.queueWaveTable(this.audioContext, this.audioContext.destination, soundFont, 0, note, duration, this.volume);
-    console.log('i', note, playbackRate);
     envelope.audioBufferSourceNode.playbackRate.cancelScheduledValues(0);
     envelope.audioBufferSourceNode.playbackRate.setValueAtTime(playbackRate, 0);
     this.envelopes.push(envelope);
@@ -34,7 +33,13 @@ export class AudioFontPlayer {
 
   playChord(pitches: number[]) {
     this.stop();
-    pitches.forEach(pitch => this.queueNote(pitch, 999));
+    pitches.forEach(pitch => this.queueNote(pitch, 0.3));
+  }
+
+  strumChord(pitches: number[]){
+    this.stop();
+    this.player.queueStrumDown(this.audioContext, this.audioContext.destination, soundFont, 0, pitches, 0.5, this.volume);
+    // pitches.forEach(pitch => this.queueNote(pitch, 0.1));
   }
 
   stop() {
