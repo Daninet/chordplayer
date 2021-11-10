@@ -1,6 +1,7 @@
 import React from 'react';
-import { CHORDTYPES, NOTES, NOTES_CHROMATIC_ORDER, NOTES_FIFTHS_ORDER } from './chords';
+import { CHORDTYPES } from './chords';
 import styles from './ChordButtons.module.scss';
+import { ChordButtonLine } from './ChordButtonLine';
 
 interface ChordButtonsProps {
   activeNote: number;
@@ -14,6 +15,7 @@ interface ChordButtonsProps {
 
 export const CHROMATIC_KEYMAP = ['z', 's', 'x', 'd', 'c', 'v', 'g', 'b', 'h', 'n', 'j', 'm'];
 export const CHROMATIC_KEYMAP_CODES = ['KeyZ', 'KeyS', 'KeyX', 'KeyD', 'KeyC', 'KeyV', 'KeyG', 'KeyB', 'KeyH', 'KeyN', 'KeyJ', 'KeyM'];
+export const CHROMATIC_BG_WHITE = [1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 0, 1];
 export const FIFTHS_KEYMAP = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '='];
 export const FIFTHS_KEYMAP_CODES_MAJOR = ['Digit1', 'Digit2', 'Digit3', 'Digit4', 'Digit5', 'Digit6', 'Digit7', 'Digit8', 'Digit9', 'Digit0', 'Minus', 'Equal'];
 export const FIFTHS_KEYMAP_CODES_MINOR = ['KeyQ', 'KeyW', 'KeyE', 'KeyR', 'KeyT', 'KeyY', 'KeyU', 'KeyI', 'KeyO', 'KeyP', 'BracketLeft', 'BracketRight'];
@@ -22,28 +24,8 @@ export const FIFTHS_KEYMAP_CODES_SEVENTH = ['KeyA', 'KeyS', 'KeyD', 'KeyF', 'Key
 export const ChordButtons: React.FC<ChordButtonsProps> = (props) => {
   const { activeNote, activeType, pendingType, layout, setLayout, onClick, onStop } = props;
 
-  const renderButtons = (typeIndex: number) => {
-    const order = layout === 'chromatic' ? NOTES_CHROMATIC_ORDER : NOTES_FIFTHS_ORDER;
-    const isButtonActive = (noteIndex: number) => activeType === typeIndex && activeNote === noteIndex;
-
-    return (
-      <tr className={pendingType === typeIndex ? styles.pending : ''} key={typeIndex}>
-        <td>{typeIndex < 9 && layout === 'chromatic' ? typeIndex + 1 : ''}</td>
-        {order.map((noteIndex) => (
-          <td key={noteIndex + typeIndex}>
-            <button
-              className={isButtonActive(noteIndex) ? styles.active : ''}
-              onClick={() => onClick(noteIndex, typeIndex)}
-            >
-              {NOTES[noteIndex]}{CHORDTYPES[typeIndex]}
-            </button>
-          </td>
-        ))}
-      </tr>
-    );
-  }
-
   const keymap = layout === 'chromatic' ? CHROMATIC_KEYMAP : FIFTHS_KEYMAP;
+
   return (
     <div className={styles.chordbuttons}>
       <table>
@@ -54,7 +36,16 @@ export const ChordButtons: React.FC<ChordButtonsProps> = (props) => {
           </tr>
         </thead>
         <tbody>
-          {CHORDTYPES.map((_, typeIndex) => renderButtons(typeIndex))}
+          {CHORDTYPES.map((type, typeIndex) => (
+            <ChordButtonLine
+              key={type}
+              layout={layout}
+              typeIndex={typeIndex}
+              activeButton={activeType !== typeIndex ? null : activeNote}
+              pendingType={pendingType}
+              onClick={onClick}
+            />
+          ))}
           <tr>
             <td>Space</td>
             <td colSpan={12}>

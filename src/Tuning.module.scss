@@ -1,0 +1,14 @@
+.tuning {
+  margin: 0 30px;
+  display: flex;
+  max-width: 50%;
+  justify-content: space-around;
+
+  > div {
+    width: 50%;
+  }
+
+  select, button {
+    margin-left: 5px;
+  }
+}

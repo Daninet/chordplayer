@@ -2,10 +2,19 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import styles from './App.module.scss';
 import { AudioFontPlayer } from './AudioFontPlayer';
 import { ChordButtons, CHROMATIC_KEYMAP_CODES, FIFTHS_KEYMAP_CODES_SEVENTH, FIFTHS_KEYMAP_CODES_MINOR, FIFTHS_KEYMAP_CODES_MAJOR } from './ChordButtons';
-import { CHORDTYPES, getChordPitches, getChordPositions, NOTES, NOTES_FIFTHS_ORDER, positionsToPitches } from './chords';
+import { CHORDTYPES, getChordContext, NOTES, NOTES_FIFTHS_ORDER } from './chords';
 import { ChordView } from './ChordView';
 import { Sliders } from './Sliders';
 import { Sustain } from './Sustain';
+import { Tuning } from './Tuning';
+
+const defaultTuning = [
+  Number(localStorage.getItem(`viola-tuning-1`) ?? '55'),
+  Number(localStorage.getItem(`viola-tuning-2`) ?? '62'),
+  Number(localStorage.getItem(`viola-tuning-3`) ?? '57'),
+];
+
+const maxPos = Number(localStorage.getItem(`viola-max-pos`) ?? '8');
 
 export const App: React.FC = () => {
   const player = useRef(null);
@@ -16,6 +25,7 @@ export const App: React.FC = () => {
     setReady(true);
   }, []);
 
+  const [chordContext, setChordContext] = useState(getChordContext({ TUNING: defaultTuning, MAX_POS: maxPos }));
   const [lastChordNote, setLastChordNote] = useState(0);
   const [lastChordType, setLastChordType] = useState(0);
   const [keyUpEvent, setKeyUpEvent] = useState(true);
@@ -23,7 +33,8 @@ export const App: React.FC = () => {
   const [layout, setLayout] = useState<'chromatic' | 'fifths'>('chromatic');
   const [, render] = useState(0);
 
-  const getStorageKey = (note: string, type: string) => `viola-${note}${type}`;
+
+  const getStorageKey = useCallback((note: string, type: string) => `viola-${chordContext.TUNING.join('-')}-${note}${type}`, [chordContext]);
   const storageKey = getStorageKey(NOTES[lastChordNote], CHORDTYPES[lastChordType]);
 
   const getPitches = useCallback((note: string, type: string) => {
@@ -33,43 +44,47 @@ export const App: React.FC = () => {
       try {
         const parsed = JSON.parse(stored);
         if (Array.isArray(parsed) && parsed.length === 3 && parsed.every(p => Number.isInteger(p))) {
-          console.log(parsed, positionsToPitches(parsed));
-          return positionsToPitches(parsed);
+          return chordContext.positionsToPitches(parsed);
         }
       } catch (err) {}
     }
 
-    return getChordPitches(
+    const pitches = chordContext.getChordPitches(
       NOTES.indexOf(note),
       CHORDTYPES.indexOf(type)
-    )[0];
-  }, []);
+    );
+
+    return pitches?.[0];
+  }, [getStorageKey, chordContext]);
 
   const playChord = useCallback((note: number, type: number) => {
     const pitches = getPitches(NOTES[note], CHORDTYPES[type]);
 
+    if (pitches) {
+      player.current.playChord(pitches);
+    }
+
     setLastChordNote(note);
     setLastChordType(type);
     setPendingChordType(null);
-
-    player.current.playChord(pitches);
   }, [getPitches])
 
-  const positions = getChordPositions(lastChordNote, lastChordType) ?? [];
+  const positions = chordContext.getChordPositions(lastChordNote, lastChordType) ?? [];
 
   const onChordClick = (positions: number[]) => {
-    const pitches = positionsToPitches(positions);
-    player.current.playChord(pitches);
-    localStorage.setItem(storageKey, JSON.stringify(positions));
+    const pitches = chordContext.positionsToPitches(positions);
+    if (pitches) {
+      player.current.playChord(pitches);
+      localStorage.setItem(storageKey, JSON.stringify(positions));
+    }
     render(Date.now()); // needed for the checkbox above chord icons
   };
 
-  const onStop = () => {
+  const onStop = useCallback(() => {
     player.current.stop();
-  };
+  }, []);
 
   const onKeyDownChromatic = useCallback((key: string, keyCode: string) => {
-    console.log(keyCode);
     if (CHROMATIC_KEYMAP_CODES.includes(keyCode)) {
       playChord(CHROMATIC_KEYMAP_CODES.indexOf(keyCode) % 12, pendingChordType ?? lastChordType);
       setPendingChordType(null);
@@ -88,10 +103,9 @@ export const App: React.FC = () => {
     }
 
     return false;
-  }, [pendingChordType, lastChordType, playChord]);
+  }, [onStop, pendingChordType, lastChordType, playChord]);
 
   const onKeyDownFifths = useCallback((key: string, keyCode: string) => {
-    console.log(keyCode);
     if (FIFTHS_KEYMAP_CODES_MAJOR.includes(keyCode)) {
       playChord(NOTES_FIFTHS_ORDER[FIFTHS_KEYMAP_CODES_MAJOR.indexOf(keyCode) % 12], 0);
       setPendingChordType(null);
@@ -116,7 +130,7 @@ export const App: React.FC = () => {
     }
 
     return false;
-  }, [playChord]);
+  }, [onStop, playChord]);
 
   useEffect(() => {
     const listener = (e) => {
@@ -148,23 +162,9 @@ export const App: React.FC = () => {
     }
     document.addEventListener("keyup", listener);
     return () => document.removeEventListener("keyup", listener);
-  }, [keyUpEvent]);
+  }, [onStop, keyUpEvent]);
 
-  const renderChord = (pos: [number, number, number]) => {
-    const key = JSON.stringify(pos);
-    const isChecked = key === localStorage.getItem(storageKey);
-
-    return (
-      <ChordView
-        key={key}
-        positions={pos}
-        onClick={onChordClick}
-        isChecked={isChecked}
-      />
-    );
-  };
-
-  const onSetTuning = useCallback((freq: number) => {
+  const onSetFineTuning = useCallback((freq: number) => {
     player.current.setFreq(freq);
   }, []);
 
@@ -182,9 +182,38 @@ export const App: React.FC = () => {
     player.current.setVolume(volume);
   }, []);
 
+  const onSetTuning = useCallback((TUNING: number[]) => {
+    TUNING.forEach((val, index) => {
+      localStorage.setItem(`viola-tuning-${index + 1}`, val.toString());
+    })
+    setChordContext(getChordContext({ TUNING, MAX_POS: chordContext.MAX_POS }));
+  }, [chordContext.MAX_POS]);
+
+  const onSetMaxPos = useCallback((MAX_POS: number) => {
+    localStorage.setItem('viola-max-pos', MAX_POS.toString());
+    setChordContext(getChordContext({ TUNING: chordContext.TUNING, MAX_POS }))
+  }, [chordContext.TUNING]);
+
   if (!ready) {
     return null;
   }
+
+  const renderChord = (pos: [number, number, number]) => {
+    const key = JSON.stringify(pos);
+    const isChecked = key === localStorage.getItem(storageKey);
+
+    return (
+      <ChordView
+        key={key}
+        positions={pos}
+        tuning={chordContext.TUNING}
+        maxPos={chordContext.MAX_POS}
+        onClick={onChordClick}
+        isChecked={isChecked}
+        getAlternativeNames={chordContext.getAlternativeNames}
+      />
+    );
+  };
 
   return (
     <div className={styles.app}>
@@ -203,10 +232,17 @@ export const App: React.FC = () => {
       />
 
       <Sliders
-        onSetTuning={onSetTuning}
+        onSetTuning={onSetFineTuning}
         onSetVolume={onSetVolume}
       />
       
+      <Tuning
+        tuning={chordContext.TUNING}
+        maxPos={chordContext.MAX_POS}
+        onSetTuning={onSetTuning}
+        onSetMaxNote={onSetMaxPos}
+      />
+
       <div className={styles.chords}>
         {positions.map(pos => renderChord(pos))}
       </div>

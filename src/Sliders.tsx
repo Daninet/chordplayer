@@ -7,7 +7,7 @@ interface SlidersProps {
   onSetTuning: (tuning: number) => void;
 }
 
-export const Sliders: React.FC<SlidersProps> = (props) => {
+export const Sliders: React.FC<SlidersProps> = React.memo((props) => {
   const { onSetVolume, onSetTuning } = props;
   const [volume, setVolume] = useState(0.5);
   const debouncedVolume = useDebounce(volume, 50);
@@ -25,7 +25,7 @@ export const Sliders: React.FC<SlidersProps> = (props) => {
   return (
     <div className={styles.sliders}>
       <label>
-        Tuning
+        Fine tuning
         <br />
         <input
           className={styles.tuner}
@@ -55,4 +55,4 @@ export const Sliders: React.FC<SlidersProps> = (props) => {
       <br /> */}
     </div>
   );
-};
+});

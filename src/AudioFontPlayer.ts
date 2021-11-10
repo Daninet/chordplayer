@@ -19,7 +19,6 @@ export class AudioFontPlayer {
     // for (let i = 0; i < soundFont.zones.length; i++){
     //   soundFont.zones[i].ahdsr = false;
     // }
-    console.log(this.player, soundFont);
   }
 
   queueNote(note: number, duration: number) {
@@ -34,7 +33,7 @@ export class AudioFontPlayer {
 
   playChord(pitches: number[]) {
     this.stop();
-    pitches.forEach(pitch => this.queueNote(pitch, this.duration));
+    pitches?.forEach(pitch => this.queueNote(pitch, this.duration));
   }
 
   stop() {

@@ -6,9 +6,9 @@ interface SustainProps {
   onSetSustain: (sustain: number | null) => void;
 }
 
-export const Sustain: React.FC<SustainProps> = (props) => {
+export const Sustain: React.FC<SustainProps> = React.memo((props) => {
   const { onSetSustain } = props;
-  const [sustain, setSustain] = useState(null);
+  const [sustain, setSustain] = useState(0.3);
   const debouncedSustain = useDebounce(sustain, 25);
 
   useEffect(() => {
@@ -58,4 +58,4 @@ export const Sustain: React.FC<SustainProps> = (props) => {
       </div>
     </div>
   );
-};
+});
